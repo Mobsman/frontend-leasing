@@ -1,6 +1,5 @@
 import {Button, DatePicker, Form, Input, Space} from "antd";
 import locale from "antd/es/date-picker/locale/ru_RU";
-import {postFsbu25Calculator} from "../fsbu25calculator/api/Api";
 import {useState} from "react";
 import {postCreateLoan} from "./api/Api";
 
@@ -8,7 +7,6 @@ import {postCreateLoan} from "./api/Api";
 function LoanForm() {
 
     const dateFormat = "YYYY-MM-DD";
-
     const [loan, setLoan] = useState({})
 
     const onFinish = (values) => {
@@ -23,10 +21,10 @@ function LoanForm() {
         }
         console.log(loan)
         setLoan(loan)
-
-        postCreateLoan(loan)
-
     };
+
+    postCreateLoan(loan)
+
 
     return (<div style={{marginTop: 20}}>
 

@@ -9,7 +9,10 @@ function LoanTable() {
     const [editing, setEdit] = useState(false)
     const [editingLoan, setEditingLoan] = useState(null)
 
-    const [data, setData] = useState([])
+    const [data, setData] = useState([{
+        contractName:"12312312",
+        borrower:"ewewe"
+    }])
 
     const[responseData,setLoanResponseData]= useState([])
 
@@ -133,7 +136,7 @@ function LoanTable() {
     return (
 
         <div>
-            <Table dataSource={dataSource} columns={columns}/>
+            <Table dataSource={data} columns={columns}/>
             <Modal
                 open={editing}
                 okText="Сохранить"

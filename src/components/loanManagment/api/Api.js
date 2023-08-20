@@ -1,6 +1,6 @@
 import axios from "axios";
 
- export function postCreateLoan(loan,setLoanResponseData) {
+ export function postCreateLoan(loan,setResponseData) {
 
         const config = {
             method: "post",
@@ -15,7 +15,7 @@ import axios from "axios";
                      loanResponse: response.data,
                  };
                  console.log(responseData);
-                 setLoanResponseData(responseData)
+                 setResponseData(responseData)
              } else {
                  console.log('Ответ сервера не содержит поля "discountedFlows"');
              }
