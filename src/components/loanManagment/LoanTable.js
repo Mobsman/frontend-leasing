@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Popconfirm, Table, Modal, Input} from 'antd';
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import {postCreateLoan} from "./api/Api";
 
 
 function LoanTable() {
@@ -8,39 +9,36 @@ function LoanTable() {
     const [editing, setEdit] = useState(false)
     const [editingLoan, setEditingLoan] = useState(null)
 
-    const [data, setData] = useState([
-        {
-            key: 1,
-            nameContract: "erererer",
-            dateOfIssue: "12-12-12"
-        },
-        {
-            key: 2,
-            nameContract: "ererere",
-            dateOfIssue: "12-12-12"
-        }])
+    const [data, setData] = useState([])
 
+    const[responseData,setLoanResponseData]= useState([])
 
-    // const data = props.data.loanDTO || [];
-    // const dataSource = data.map((loan, index) => {
-    //     const contractName = loan.contractName ? loan.contractName : null;
-    //     const dateOfIssue = loan.dateOfIssue ? new Date(loan.dateOfIssue).toLocaleDateString() : null;
-    //     const dateOfEnd = loan.dateOfEnd ? new Date(loan.dateOfEnd).toLocaleDateString() : null;
-    //     const borrower = loan.borrower ? loan.borrower : null;
-    //     const loanSum = loan.loanSum ? loan.loanSum : null;
-    //     const percent = loan.percent ? loan.percent : null;
-    //     const interestReceivable = loan.interestReceivable ? loan.interestReceivable : null;
-    //
-    //     return {
-    //         contractName,
-    //         dateOfIssue,
-    //         dateOfEnd,
-    //         borrower,
-    //         loanSum,
-    //         percent,
-    //         interestReceivable
-    //     }
-    // })
+    useEffect(() => {
+        postCreateLoan(setLoanResponseData);
+    }, [])
+
+    const dataSource = responseData.map((loan, index) => {
+        const id = loan.id? loan.id : null;
+        const contractName = loan.contractName ? loan.contractName : null;
+        const dateOfIssue = loan.dateOfIssue ? new Date(loan.dateOfIssue).toLocaleDateString() : null;
+        const dateOfEnd = loan.dateOfEnd ? new Date(loan.dateOfEnd).toLocaleDateString() : null;
+        const borrower = loan.borrower ? loan.borrower : null;
+        const loanSum = loan.loanSum ? loan.loanSum : null;
+        const percent = loan.percent ? loan.percent : null;
+        const interestReceivable = loan.interestReceivable ? loan.interestReceivable : null;
+
+        return {
+            id,
+            contractName,
+            dateOfIssue,
+            dateOfEnd,
+            borrower,
+            loanSum,
+            percent,
+            interestReceivable
+        }
+    })
+
 
 
     const columns = [
@@ -135,7 +133,7 @@ function LoanTable() {
     return (
 
         <div>
-            <Table dataSource={data} columns={columns}/>
+            <Table dataSource={dataSource} columns={columns}/>
             <Modal
                 open={editing}
                 okText="Сохранить"
