@@ -1,53 +1,71 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Popconfirm, Table, Modal, Input} from 'antd';
 import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
-import {postCreateLoan} from "./api/Api";
+import {deleteLoan, postCreateLoan, updateLoan} from "./api/Api";
 
 
-function LoanTable() {
+function LoanTable({responseData, setLoanResponseData}) {
+
+    const dataSource = (responseData.loanResponse && Array.isArray(responseData.loanResponse))
+        ? responseData.loanResponse.map((loan) => {
+            const id = loan.id ? loan.id : null;
+            const loanContractName = loan.loanContractName ? loan.loanContractName : null;
+            const dateOfIssue = loan.dateOfIssue ? new Date(loan.dateOfIssue).toLocaleDateString() : null;
+            const endDate = loan.endDate ? new Date(loan.endDate).toLocaleDateString() : null;
+            const borrower = loan.borrower ? loan.borrower : null;
+            const loanAmount = loan.loanAmount ? loan.loanAmount : null;
+            const percent = loan.percent ? loan.percent : null;
+            const percentageAmount = loan.percentageAmount ? loan.percentageAmount : null;
+
+            return {
+                id,
+                loanContractName,
+                dateOfIssue,
+                endDate,
+                borrower,
+                loanAmount,
+                percent,
+                percentageAmount
+            };
+        })
+        : [];
 
     const [editing, setEdit] = useState(false)
-    const [editingLoan, setEditingLoan] = useState(null)
 
-    const [data, setData] = useState([{
-        contractName:"12312312",
-        borrower:"ewewe"
-    }])
+    const [editingLoan, setEditingLoan] = useState({})
 
-    const[responseData,setLoanResponseData]= useState([])
+    const [send, setSending] = useState({})
+
+    const [updateData, setUpdateData] = useState([])
+
+    console.log("editing", editingLoan)
 
     useEffect(() => {
-        postCreateLoan(setLoanResponseData);
-    }, [])
+        setUpdateData(dataSource);
+    }, [responseData]);
 
-    const dataSource = responseData.map((loan, index) => {
-        const id = loan.id? loan.id : null;
-        const contractName = loan.contractName ? loan.contractName : null;
-        const dateOfIssue = loan.dateOfIssue ? new Date(loan.dateOfIssue).toLocaleDateString() : null;
-        const dateOfEnd = loan.dateOfEnd ? new Date(loan.dateOfEnd).toLocaleDateString() : null;
-        const borrower = loan.borrower ? loan.borrower : null;
-        const loanSum = loan.loanSum ? loan.loanSum : null;
-        const percent = loan.percent ? loan.percent : null;
-        const interestReceivable = loan.interestReceivable ? loan.interestReceivable : null;
+    const resetEditing = () => {
+        setEdit(false)
+        setEditingLoan(null)
+    }
 
-        return {
-            id,
-            contractName,
-            dateOfIssue,
-            dateOfEnd,
-            borrower,
-            loanSum,
-            percent,
-            interestReceivable
-        }
-    })
+    const handleEdit = (record) => {
+        console.log("handleEdit", record)
+        setEdit(true)
+        setEditingLoan({...record})
+        setSending({...record})
+    }
 
+    console.log("send", send)
 
+    const handleDelete = (id) => {
+        deleteLoan(id, setLoanResponseData).then()
+    };
 
     const columns = [
         {
             title: 'Договор займа',
-            dataIndex: 'contractName',
+            dataIndex: 'loanContractName',
 
             editable: true,
         },
@@ -59,7 +77,7 @@ function LoanTable() {
         },
         {
             title: 'Дата завершения',
-            dataIndex: 'dateOfEnd',
+            dataIndex: 'endDate',
 
             editable: true,
         },
@@ -72,7 +90,7 @@ function LoanTable() {
         },
         {
             title: 'Сумма займа',
-            dataIndex: 'loanSum',
+            dataIndex: 'loanAmount',
 
             editable: true,
         },
@@ -86,10 +104,11 @@ function LoanTable() {
 
         {
             title: 'Проценты к получению',
-            dataIndex: 'interestReceivable',
+            dataIndex: 'percentageAmount',
 
             editable: true,
         },
+
 
         {
             title: 'Редактирование',
@@ -103,7 +122,7 @@ function LoanTable() {
 
                         }} style={{marginLeft: 20,}}/>
                         <Popconfirm okText="да" cancelText="нет" title="Удалить?" onConfirm={() => {
-                            handleDelete(record.key)
+                            handleDelete(record.id)
                         }}>
                             <DeleteOutlined style={{marginLeft: 30, color: "red"}}/>
                         </Popconfirm>
@@ -115,28 +134,11 @@ function LoanTable() {
 
     ];
 
-    const resetEditing = () => {
-        setEdit(false)
-        setEditingLoan(null)
-    }
-
-    const handleEdit = (record) => {
-        setEdit(true)
-        setEditingLoan({...record})
-
-    }
-
-    const handleDelete = (key) => {
-        console.log(key)
-        const newData = data.filter((item) => item.key !== key);
-        setData(newData);
-    };
-
 
     return (
 
         <div>
-            <Table dataSource={data} columns={columns}/>
+            <Table dataSource={updateData} columns={columns} size={"middle"}/>
             <Modal
                 open={editing}
                 okText="Сохранить"
@@ -145,28 +147,53 @@ function LoanTable() {
                     resetEditing()
                 }}
                 onOk={() => {
-                    setData(pre=>{
-                        return pre.map(loanContract=>{
-                            if(loanContract.key=== editingLoan.key){
-                                return editingLoan
-                            } else{
-                                return loanContract;
-                            }
-                        })
-                    })
-                    resetEditing()
+                    setSending(prevEditingLoan => {
+                        // console.log("setEditingLoan",prevEditingLoan)
+                        // console.log("editingLoan",editingLoan)
+
+                        if (JSON.stringify(prevEditingLoan) !== JSON.stringify(editingLoan)) {
+                            return editingLoan;
+                        } else {
+                            return null;
+                        }
+
+                    });
+
+                    if (editingLoan !== null) {
+                        updateLoan(editingLoan, setLoanResponseData).then()
+                    }
+                    resetEditing();
                 }}>
-                <Input style={{marginTop:20}} value={editingLoan?.nameContract} onChange={(e) => {
+                <Input style={{marginTop: 20}} value={editingLoan?.loanContractName} onChange={(e) => {
                     setEditingLoan(pre => {
-                        return {...pre, nameContract: e.target.value}
+                        return {...pre, loanContractName: e.target.value}
                     })
                 }}/>
-                <Input style={{marginTop:20}} value={editingLoan?.dateOfIssue} onChange={(e) => {
+                <Input style={{marginTop: 20}} value={editingLoan?.dateOfIssue} onChange={(e) => {
                     setEditingLoan(pre => {
                         return {...pre, dateOfIssue: e.target.value}
                     })
                 }}/>
-
+                <Input style={{marginTop: 20}} value={editingLoan?.endDate} onChange={(e) => {
+                    setEditingLoan(pre => {
+                        return {...pre, endDate: e.target.value}
+                    })
+                }}/>
+                <Input style={{marginTop: 20}} value={editingLoan?.borrower} onChange={(e) => {
+                    setEditingLoan(pre => {
+                        return {...pre, borrower: e.target.value}
+                    })
+                }}/>
+                <Input style={{marginTop: 20}} value={editingLoan?.loanAmount} onChange={(e) => {
+                    setEditingLoan(pre => {
+                        return {...pre, loanAmount: e.target.value}
+                    })
+                }}/>
+                <Input style={{marginTop: 20}} value={editingLoan?.percent} onChange={(e) => {
+                    setEditingLoan(pre => {
+                        return {...pre, percent: e.target.value}
+                    })
+                }}/>
             </Modal>
         </div>
 
