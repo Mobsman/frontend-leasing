@@ -52,15 +52,15 @@ export function deleteLoan(id, setLoanResponse) {
         })
 }
 
-export function updateLoan(loan,setLoanResponse) {
+export function updateLoan(loan, setLoanResponse) {
 
     const config = {
         method: "put",
-        url: "http://localhost:8080/api/update-loan/"+loan.id,
+        url: "http://localhost:8080/api/update-loan/" + loan.id,
         data: loan,
     };
 
-console.log(loan)
+    console.log(loan)
 
     return axios(config)
         .then(response => {
@@ -79,4 +79,52 @@ console.log(loan)
 
 
         })
+}
+
+export function postPayment(payment, id, setPaymentResponse) {
+    console.log("Отправка", payment);
+
+    const config = {
+        method: "post",
+        url: `http://localhost:8080/api/new-payment/${id}`,
+        data: payment,
+    };
+
+    return axios(config)
+        .then(response => {
+            if (response.data) {
+                setPaymentResponse({
+                    paymentResponse: response.data
+                });
+                console.log("Loan deleted successfully", response.data);
+            } else {
+                console.log('Ответ сервера не содержит поля "discountedFlows"');
+            }
+        })
+        .catch(error => {
+            console.error("Ошибка при удалении займа", error);
+        });
+}
+
+export function getAllPayment(id,setPaymentResponse) {
+
+    const config = {
+        method: "get",
+        url: `http://localhost:8080/api/get-all-payments/${id}`,
+    };
+
+    return axios(config)
+        .then(response => {
+            if (response.data) {
+                setPaymentResponse({
+                    paymentResponse: response.data
+                });
+                console.log("Loan deleted successfully", response.data);
+            } else {
+                console.log('Ответ сервера не содержит поля "discountedFlows"');
+            }
+        })
+        .catch(error => {
+            console.error("Ошибка при удалении займа", error);
+        });
 }

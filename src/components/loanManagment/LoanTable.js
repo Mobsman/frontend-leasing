@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Popconfirm, Table, Modal, Input} from 'antd';
-import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
-import {deleteLoan, postCreateLoan, updateLoan} from "./api/Api";
+import {DeleteOutlined, EditOutlined, PlusOutlined, PlusSquareOutlined} from "@ant-design/icons";
+import {deleteLoan, postCreateLoan, postPayment, updateLoan} from "./api/Api";
+import LoanRepayment from "./LoanRepayment";
 
 
 function LoanTable({responseData, setLoanResponseData}) {
@@ -38,6 +39,8 @@ function LoanTable({responseData, setLoanResponseData}) {
 
     const [updateData, setUpdateData] = useState([])
 
+
+
     console.log("editing", editingLoan)
 
     useEffect(() => {
@@ -61,6 +64,9 @@ function LoanTable({responseData, setLoanResponseData}) {
     const handleDelete = (id) => {
         deleteLoan(id, setLoanResponseData).then()
     };
+
+    const [percentVisible, setPercentVisible] = useState(false)
+
 
     const columns = [
         {
@@ -96,7 +102,7 @@ function LoanTable({responseData, setLoanResponseData}) {
         },
 
         {
-            title: 'Процентая ставка',
+            title: 'Ставка %',
             dataIndex: 'percent',
 
             editable: true,
@@ -108,7 +114,18 @@ function LoanTable({responseData, setLoanResponseData}) {
 
             editable: true,
         },
-
+        {
+            title: 'Погашение',
+            dataIndex: 'repayment',
+            render: (_, record) => {
+                return (
+                    <>
+                         <PlusSquareOutlined onClick={() => setPercentVisible(true)} style={{marginLeft: 20, color: "green"}}/>
+                         <LoanRepayment record={record} percentVisible={percentVisible} setPercentVisible={setPercentVisible}/>
+                    </>
+                )
+            }
+        },
 
         {
             title: 'Редактирование',
