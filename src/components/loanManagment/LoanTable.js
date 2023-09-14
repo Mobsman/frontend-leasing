@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Popconfirm, Table, Modal, Input} from 'antd';
-import {DeleteOutlined, EditOutlined, PlusOutlined, PlusSquareOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, PercentageOutlined, PlusOutlined, PlusSquareOutlined} from "@ant-design/icons";
 import {deleteLoan, postCreateLoan, postPayment, updateLoan} from "./api/Api";
 import LoanRepayment from "./LoanRepayment";
+import PercentTable from "./PercentTable";
 
 
 function LoanTable({responseData, setLoanResponseData}) {
@@ -26,7 +27,7 @@ function LoanTable({responseData, setLoanResponseData}) {
                 borrower,
                 loanAmount,
                 percent,
-                percentageAmount
+                percentageAmount,
             };
         })
         : [];
@@ -65,63 +66,103 @@ function LoanTable({responseData, setLoanResponseData}) {
         deleteLoan(id, setLoanResponseData).then()
     };
 
-    const [percentVisible, setPercentVisible] = useState(false)
+   // const [percentVisible, setPercentVisible] = useState(false)
 
+    const [percentVisible, setPercentVisible] = useState(Array(dataSource.length).fill(false));
+    const [percentCalculationVisible, setPercentCalculationVisible] = useState(Array(dataSource.length).fill(false));
+
+    const handlePercentVisible = (index) => {
+        const updatedVisibleStates = [...percentVisible];
+        updatedVisibleStates[index] = !updatedVisibleStates[index];
+        setPercentVisible(updatedVisibleStates);
+    };
+
+    const handlePercentVisibilityChange = (index, value) => {
+        const updatedVisibleStates = [...percentVisible];
+        updatedVisibleStates[index] = value;
+        setPercentVisible(updatedVisibleStates);
+    };
+
+
+
+    const handlePercentCalculationVisible = (index) => {
+        const updatedVisibleStates = [...percentCalculationVisible];
+        updatedVisibleStates[index] = !updatedVisibleStates[index];
+        setPercentCalculationVisible(updatedVisibleStates);
+    };
+
+    const handlePercentCalculationVisibilityChange = (index, value) => {
+        const updatedVisibleStates = [...percentCalculationVisible];
+        updatedVisibleStates[index] = value;
+        setPercentCalculationVisible(updatedVisibleStates);
+    };
 
     const columns = [
         {
             title: 'Договор займа',
             dataIndex: 'loanContractName',
-
             editable: true,
         },
         {
             title: 'Дата выдачи',
             dataIndex: 'dateOfIssue',
-
+            align: 'center',
             editable: true,
         },
         {
             title: 'Дата завершения',
             dataIndex: 'endDate',
-
+            align: 'center',
             editable: true,
         },
 
         {
             title: 'Заемщик',
             dataIndex: 'borrower',
-
             editable: true,
         },
         {
             title: 'Сумма займа',
             dataIndex: 'loanAmount',
-
+            align: 'center',
             editable: true,
         },
 
         {
             title: 'Ставка %',
             dataIndex: 'percent',
-
+            align: 'center',
             editable: true,
         },
 
         {
             title: 'Проценты к получению',
             dataIndex: 'percentageAmount',
-
+            align: 'center',
             editable: true,
+        },
+        {
+            title: 'Расчет процентов',
+            dataIndex: 'percentCalculation',
+            align: 'center',
+            render: (_, record,index) => {
+                return (
+                    <>
+                        <PercentageOutlined onClick={() => handlePercentCalculationVisible(index)} style={{marginLeft: 20, color: "green"}}/>
+                        <PercentTable  record={record} percentCalculationVisible={percentCalculationVisible[index]}
+                                       setPercentCalculationVisible={value => handlePercentCalculationVisibilityChange(index, value)}/>
+                    </>
+                )
+            }
         },
         {
             title: 'Погашение',
             dataIndex: 'repayment',
-            render: (_, record) => {
+            render: (_, record,index) => {
                 return (
                     <>
-                         <PlusSquareOutlined onClick={() => setPercentVisible(true)} style={{marginLeft: 20, color: "green"}}/>
-                         <LoanRepayment record={record} percentVisible={percentVisible} setPercentVisible={setPercentVisible}/>
+                         <PlusSquareOutlined onClick={() =>handlePercentVisible(index)} style={{marginLeft: 20, color: "green"}}/>
+                         <LoanRepayment record={record} percentVisible={percentVisible[index]} setPercentVisible={value => handlePercentVisibilityChange(index, value)}/>
                     </>
                 )
             }
@@ -165,8 +206,6 @@ function LoanTable({responseData, setLoanResponseData}) {
                 }}
                 onOk={() => {
                     setSending(prevEditingLoan => {
-                        // console.log("setEditingLoan",prevEditingLoan)
-                        // console.log("editingLoan",editingLoan)
 
                         if (JSON.stringify(prevEditingLoan) !== JSON.stringify(editingLoan)) {
                             return editingLoan;

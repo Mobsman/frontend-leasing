@@ -107,7 +107,6 @@ export function postPayment(payment, id, setPaymentResponse) {
 }
 
 export function getAllPayment(id,setPaymentResponse) {
-
     const config = {
         method: "get",
         url: `http://localhost:8080/api/get-all-payments/${id}`,
@@ -118,6 +117,29 @@ export function getAllPayment(id,setPaymentResponse) {
             if (response.data) {
                 setPaymentResponse({
                     paymentResponse: response.data
+                });
+                console.log("Loan deleted successfully", response.data);
+            } else {
+                console.log('Ответ сервера не содержит поля "discountedFlows"');
+            }
+        })
+        .catch(error => {
+            console.error("Ошибка при удалении займа", error);
+        });
+}
+
+export function getAllPercents(id,setCalculatorPercentResponse) {
+
+    const config = {
+        method: "get",
+        url: `http://localhost:8080/api/get-all-percents/${id}`,
+    };
+
+    return axios(config)
+        .then(response => {
+            if (response.data) {
+                setCalculatorPercentResponse({
+                    percentResponse: response.data
                 });
                 console.log("Loan deleted successfully", response.data);
             } else {
