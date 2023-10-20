@@ -5,6 +5,7 @@ import {BrowserRouter as Router, Routes, Route, useNavigate} from 'react-router-
 import CalculatorFSBU25Form from "./fsbu25calculator/CalculatorFSBU25Form";
 import CalculatorLeasingContractForm from "./fsbu25calculator/CalculatorLeasingContractForm";
 import LoanManagement from "./loanManagment/LoanManagement";
+import LoginForm from "./login/loginForm";
 
 function getItem(label, key, icon, children) {
     return {key, icon, children, label};
@@ -21,30 +22,34 @@ const items = [
 function AppMenu() {
 
     const navigate = useNavigate()
+    const someVariable = false
 
     return (
-
-        <div style={{display: "flex", flexDirection: "row"}}>
-
-            <Divider type="vertical"/>
-            <Menu style={{width: 300, borderRadius: 10, marginTop: 10, marginBottom: 10, marginRight: 20}}
-                  mode="inline"
-                  theme='light'
-                  items={items}
-
-                  onClick={({key}) => {
-                      navigate(key)
-                  }}
-            />
-            <Content/>
+        <div>
+            {someVariable ? (
+                <div style={{display: "flex", flexDirection: "row"}}>
+                    <Divider type="vertical"/>
+                    <Menu
+                        style={{width: 300, borderRadius: 10, marginTop: 10, marginBottom: 10, marginRight: 20}}
+                        mode="inline"
+                        theme='light'
+                        items={items}
+                        onClick={({key}) => {
+                            navigate(key)
+                        }}
+                    />
+                    <Content/>
+                </div>
+            ) : (
+                <LoginForm/>
+            )}
         </div>
     );
 }
 
 function Content() {
-    return <div>
+    return <div style={{flex: 1}}>
         <Routes>
-            <Route path="/" element={<h1></h1>}/>
             <Route path="/calculator-25" element={<CalculatorFSBU25Form/>}/>
             <Route path="/calculator-leasing-contract" element={<LoanManagement/>}/>
         </Routes>

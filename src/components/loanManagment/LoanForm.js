@@ -1,7 +1,6 @@
 import {Button, DatePicker, Form, Input, Space} from "antd";
 import locale from "antd/es/date-picker/locale/ru_RU";
-import {useEffect, useState} from "react";
-import {postCreateLoan} from "./api/Api";
+
 
 
 function LoanForm({setLoan}) {
